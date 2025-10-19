@@ -1,13 +1,12 @@
 import express from "express"
 import db_connect from "./Database/db_connect.js";
+import Adminroutes from "./routes/adminroutes.js";
 const app=express();
 
 
 
 await db_connect();
-app.get("/",(req,res)=>{
-    res.send("Server setup done");
-})
+app.use("/admin",Adminroutes);
 
 
 
