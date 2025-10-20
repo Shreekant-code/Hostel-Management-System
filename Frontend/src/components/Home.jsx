@@ -4,7 +4,7 @@ import { User, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
-//   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white px-4 md:px-0">
@@ -32,7 +32,7 @@ export const Home = () => {
       
       </div>
 
-      {/* Header */}
+      
       <header className="z-10 text-center mb-12">
         <motion.h1
           className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-400 to-blue-400"
@@ -61,7 +61,7 @@ export const Home = () => {
       >
         
         <motion.button
-        //   onClick={() => navigate("/admin-login")}
+          onClick={() => navigate("/adminSignin")}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="group flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-3xl bg-gradient-to-r from-indigo-500 to-purple-600 font-semibold shadow-lg shadow-indigo-900 hover:shadow-purple-700 transition-all w-56 sm:w-auto justify-center"
@@ -72,7 +72,7 @@ export const Home = () => {
 
         
         <motion.button
-        //   onClick={() => navigate("/student-login")}
+          onClick={() => navigate("/studnetSignin")}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="group flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-3xl bg-gradient-to-r from-emerald-500 to-cyan-500 font-semibold shadow-lg shadow-emerald-900 hover:shadow-cyan-700 transition-all w-56 sm:w-auto justify-center"

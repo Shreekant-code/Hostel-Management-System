@@ -1,9 +1,8 @@
-// middleware/auth.js
+
 import jwt from "jsonwebtoken";
 import User from "../Schema/userschema.js";
 
-const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "your_access_secret";
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "your_refresh_secret";
+
 
 
 export const protect = async (req, res, next) => {
@@ -13,7 +12,7 @@ export const protect = async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
 
     try {
-      const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
       req.user = await User.findById(decoded.id).select("-password");
       next();
     } catch (err) {
