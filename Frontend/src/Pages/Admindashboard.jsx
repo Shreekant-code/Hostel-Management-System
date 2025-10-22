@@ -13,12 +13,12 @@ import {
 
 export const Admindashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true); // preloader
+  const [loading, setLoading] = useState(true);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 3000);
+    const timer = setTimeout(() => setLoading(false), 5000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -29,7 +29,7 @@ export const Admindashboard = () => {
           src="https://lottie.host/24974383-c52e-4460-957f-0b88e2980ff1/R9E2PMqnsM.lottie"
           autoplay
           loop
-          style={{ width: 300, height: 300 }}
+          style={{ width: 600, height: 600 }}
         />
       </div>
     );
@@ -37,7 +37,7 @@ export const Admindashboard = () => {
 
   return (
     <>
-      {/* Navbar */}
+    
       <nav className="fixed top-0 z-50 w-full bg-gray-900 border-b border-gray-700">
         <div className="px-4 py-3 lg:px-5 bg-black flex items-center justify-between">
           <div className="flex items-center">
@@ -67,58 +67,70 @@ export const Admindashboard = () => {
         </div>
       </nav>
 
-      {/* Sidebar */}
+    
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-gray-900 border-r border-gray-700 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } sm:translate-x-0`}
-        aria-label="Sidebar"
-      >
-        <div className="h-full px-3 pb-4 overflow-y-auto">
-          <ul className="space-y-2 font-medium text-gray-300">
-            <li>
-              <Link
-                to="/admindashboard"
-                className="flex items-center p-2 rounded-lg hover:bg-gray-800 transition"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <LayoutDashboard className="w-5 h-5 mr-3" />
-                <span>Dashboard</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admindashboard/add-student"
-                className="flex items-center p-2 rounded-lg hover:bg-gray-800 transition"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <UserPlus className="w-5 h-5 mr-3" />
-                <span>Add Student</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admindashboard/students"
-                className="flex items-center p-2 rounded-lg hover:bg-gray-800 transition"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <Users className="w-5 h-5 mr-3" />
-                <span>Students</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admindashboard/rooms"
-                className="flex items-center p-2 rounded-lg hover:bg-gray-800 transition"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <BedDouble className="w-5 h-5 mr-3" />
-                <span>Rooms</span>
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </aside>
+  className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-gray-900 border-r border-gray-700 transform transition-transform duration-300 ease-in-out ${
+    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+  } sm:translate-x-0`}
+  aria-label="Sidebar"
+>
+  <div className="h-full px-3 pb-4 flex flex-col justify-between overflow-y-auto">
+   
+    <ul className="space-y-2 font-medium text-gray-300">
+      <li>
+        <Link
+          to="/admindashboard"
+          className="flex items-center p-2 rounded-lg hover:bg-gray-800 transition"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <LayoutDashboard className="w-5 h-5 mr-3" />
+          <span>Dashboard</span>
+        </Link>
+      </li>
+      <li>
+        <Link
+          to="/admindashboard/add-student"
+          className="flex items-center p-2 rounded-lg hover:bg-gray-800 transition"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <UserPlus className="w-5 h-5 mr-3" />
+          <span>Add Student</span>
+        </Link>
+      </li>
+      <li>
+        <Link
+          to="/admindashboard/students"
+          className="flex items-center p-2 rounded-lg hover:bg-gray-800 transition"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <Users className="w-5 h-5 mr-3" />
+          <span>Students</span>
+        </Link>
+      </li>
+      <li>
+        <Link
+          to="/admindashboard/upcoming-feature"
+          className="flex items-center p-2 rounded-lg hover:bg-gray-800 transition"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <BedDouble className="w-5 h-5 mr-3" />
+          <span>Upcoming Features</span>
+        </Link>
+      </li>
+    </ul>
+
+  
+    <div className="mt-auto flex justify-center pb-4">
+      <DotLottieReact
+        src="https://lottie.host/be6b7a2a-3884-460e-979a-e1afc5ffeaa7/sgPIXr9nhO.lottie"
+        loop
+        autoplay
+        className="w-50 h-130"
+      />
+    </div>
+  </div>
+</aside>
+
 
       {isSidebarOpen && (
         <div
@@ -127,7 +139,7 @@ export const Admindashboard = () => {
         ></div>
       )}
 
-      {/* Main content */}
+    
       <main className="p-4 sm:ml-62 mt-16 bg-black min-h-screen text-white transition-all duration-300">
         <div className="rounded-lg px-0 py-2">
           <Outlet />

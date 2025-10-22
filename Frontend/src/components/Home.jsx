@@ -51,7 +51,7 @@ export const Home = () => {
           </button>
 
           <button
-            onClick={() => navigate("/studnetSignin")}
+            onClick={() => navigate("/studentSignin")}
             className="group flex items-center justify-center gap-3 px-8 py-3 rounded-2xl 
               bg-gradient-to-r from-emerald-500 to-cyan-500 font-semibold shadow-lg 
               shadow-emerald-900 hover:shadow-cyan-700 transition-all w-56 sm:w-auto z-10"

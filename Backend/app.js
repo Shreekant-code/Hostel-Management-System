@@ -4,6 +4,7 @@ import Adminroutes from "./routes/adminroutes.js";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
+import Studentrouter from "./routes/studentroute.js";
 const app=express();
 dotenv.config();
 app.use(
@@ -21,6 +22,7 @@ app.use(cookieParser());
 await db_connect();
 app.use(express.json());
 app.use("/admin",Adminroutes);
+app.use("/student",Studentrouter);
 
 
 

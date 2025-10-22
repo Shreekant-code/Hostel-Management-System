@@ -2,11 +2,11 @@ import bcrypt from "bcryptjs";
 import streamifier from "streamifier";
 import Student from "../Schema/studentschema.js";
 import Room from "../Schema/Roomschema.js";
+import User from "../Schema/userschema.js";
 import { sendStudentWelcomeEmail } from "./sendmail.js";
 import { v2 as cloudinary } from "cloudinary";
-import User from "../Schema/userschema.js";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 dotenv.config();
 
 
@@ -16,59 +16,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const AdminLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Please provide email and password" });
-    }
-
-  
-    const admin = await User.findOne({ email, role: "admin" });
-    if (!admin) return res.status(401).json({ message: "Invalid credentials" });
-
-   
-    const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
-
-    const accessToken = jwt.sign(
-      { id: admin._id, role: admin.role },
-      process.env.JWT_ACCESS_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    const refreshToken = jwt.sign(
-      { id: admin._id, role: admin.role },
-      process.env.JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-   
-    res.status(200).json({
-      message: "Login successful",
-      user: { id: admin._id, email: admin.email, role: admin.role },
-      accessToken,
-    });
-
-  } catch (err) {
-    console.error("Admin login error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-
-
+// Helper: generate random password
 const generatePassword = (length = 10) => {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!";
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let password = "";
   for (let i = 0; i < length; i++) {
     password += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -76,7 +27,7 @@ const generatePassword = (length = 10) => {
   return password;
 };
 
-
+// Helper: upload image to Cloudinary
 const uploadImage = async (fileBuffer) => {
   if (!fileBuffer) return null;
   return new Promise((resolve, reject) => {
@@ -91,10 +42,9 @@ const uploadImage = async (fileBuffer) => {
   });
 };
 
-// Assign room based on gender
+// Helper: assign a room based on gender
 const assignRoom = async (student, gender) => {
-  // Room gender is lowercase, student gender is capitalized
-  const roomGender = gender.toLowerCase(); 
+  const roomGender = gender.toLowerCase();
   const availableRooms = await Room.find({
     gender: roomGender,
     $expr: { $lt: [{ $size: "$students" }, "$capacity"] },
@@ -112,62 +62,123 @@ const assignRoom = async (student, gender) => {
   return room;
 };
 
+export const AdminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.status(400).json({ message: "Please provide email and password" });
+
+    const admin = await User.findOne({ email, role: "admin" });
+    if (!admin) return res.status(401).json({ message: "Invalid credentials" });
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
+    const accessToken = jwt.sign(
+      { id: admin._id, role: admin.role },
+      process.env.JWT_ACCESS_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: admin._id, role: admin.role },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Login successful",
+      user: { id: admin._id, email: admin.email, role: admin.role },
+      accessToken,
+    });
+  } catch (err) {
+    console.error("Admin login error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 export const createStudent = async (req, res) => {
   try {
-    let { firstName, lastName, email, phone, gender, dateOfBirth, address, parentDetails, admissionYear, year } = req.body;
-
-   
-    if (!firstName || !lastName || !email   || !gender || !admissionYear || !year) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    
-    gender = gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase(); 
-   
-    const yearMap = { "1": "1st", "2": "2nd", "3": "3rd", "4": "4th" };
-    year = yearMap[year] || year;
-
-  
-    const existingStudent = await Student.findOne({ email });
-    if (existingStudent) return res.status(400).json({ message: "Email already exists" });
-
-  
-    const randomPassword = generatePassword(10);
-    const hashedPassword = await bcrypt.hash(randomPassword, 10);
-
-
-    const imageUrl = req.file ? await uploadImage(req.file.buffer) : null;
-
-    
-    const student = new Student({
+    let {
       firstName,
       lastName,
       email,
       phone,
       gender,
       dateOfBirth,
-      address: typeof address === "string" ? JSON.parse(address) : address,
-      parentDetails: typeof parentDetails === "string" ? JSON.parse(parentDetails) : parentDetails,
+      address,
+      fatherName,
+    fatherPhone,
+    motherName,motherPhone,
       admissionYear,
       year,
-      password: hashedPassword,
-      image: imageUrl,
-    });
+    } = req.body;
+
+    if (!firstName || !lastName || !email || !gender || !admissionYear || !year)
+      return res.status(400).json({ message: "Missing required fields" });
+
+    gender = gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+    const yearMap = { "1": "1st", "2": "2nd", "3": "3rd", "4": "4th" };
+    year = yearMap[year] || year;
 
    
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: "Email already exists" });
+
+    const randomPassword = generatePassword(10);
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+    const imageUrl = req.file ? await uploadImage(req.file.buffer) : null;
+
+  const student = new Student({
+  firstName,
+  lastName,
+  email,
+  phone,
+  gender, 
+  dateOfBirth,
+  address: typeof address === "string" ? JSON.parse(address) : address || {},
+  parentDetails: {
+    fatherName,
+    fatherPhone,
+    motherName,
+    motherPhone,
+  },
+  admissionYear,
+  year,
+  image: imageUrl,
+});
+
+
+
     const room = await assignRoom(student, gender);
     if (!room) return res.status(400).json({ message: "No available room for this gender" });
 
-    
+    student.room = room._id;
     await student.save();
 
-    
+    const user = new User({
+      _id: student._id,
+      email,
+      password: hashedPassword,
+      role: "student",
+      gender,
+      room: room._id,
+    });
+    await user.save();
+
     sendStudentWelcomeEmail(email, firstName, randomPassword, room.roomNumber)
       .then(() => console.log("✅ Welcome email sent"))
-      .catch(err => console.error("❌ Email sending failed:", err));
+      .catch((err) => console.error("❌ Email sending failed:", err));
 
-   
     res.status(201).json({
       message: "Student created successfully",
       student: {
@@ -178,14 +189,11 @@ export const createStudent = async (req, res) => {
         image: student.image,
       },
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
-
 
 
 export const getAllStudents = async (req, res) => {
@@ -198,13 +206,11 @@ export const getAllStudents = async (req, res) => {
   }
 };
 
-
 export const getStudentById = async (req, res) => {
   try {
     const { id } = req.params;
     const student = await Student.findById(id).populate("room", "roomNumber capacity students");
     if (!student) return res.status(404).json({ message: "Student not found" });
-
     res.status(200).json({ student });
   } catch (err) {
     console.error(err);
@@ -232,14 +238,16 @@ export const updateStudent = async (req, res) => {
     const student = await Student.findById(id);
     if (!student) return res.status(404).json({ message: "Student not found" });
 
-    // Check email uniqueness
+    // Check email in User collection
     if (email && email !== student.email) {
-      const exists = await Student.findOne({ email });
+      const exists = await User.findOne({ email });
       if (exists) return res.status(400).json({ message: "Email already exists" });
       student.email = email;
+      const user = await User.findById(student._id);
+      if (user) user.email = email;
+      await user.save();
     }
 
-    // Update fields
     student.firstName = firstName || student.firstName;
     student.lastName = lastName || student.lastName;
     student.phone = phone || student.phone;
@@ -250,16 +258,12 @@ export const updateStudent = async (req, res) => {
     student.admissionYear = admissionYear || student.admissionYear;
     student.year = year || student.year;
 
-    // Handle gender change and room reassignment
     if (gender && gender !== student.gender) {
-      // Remove from old room
       if (student.room) {
         const oldRoom = await Room.findById(student.room);
-        oldRoom.students = oldRoom.students.filter(s => s.toString() !== student._id.toString());
+        oldRoom.students = oldRoom.students.filter((s) => s.toString() !== student._id.toString());
         await oldRoom.save();
       }
-
-      // Assign new room
       const newRoom = await assignRoom(student, gender);
       if (!newRoom) return res.status(400).json({ message: "No available room for this gender" });
     }
@@ -271,17 +275,13 @@ export const updateStudent = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
 export const deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
     const student = await Student.findById(id);
-    if (!student) {
-      return res.status(404).json({ success: false, message: "Student not found" });
-    }
+    if (!student) return res.status(404).json({ success: false, message: "Student not found" });
 
-    // Remove student from room if assigned
+    // Remove student from room
     if (student.room) {
       const room = await Room.findById(student.room);
       if (room) {
@@ -290,16 +290,18 @@ export const deleteStudent = async (req, res) => {
       }
     }
 
-    // Delete student
-    await student.deleteOne();
+     // Also delete the corresponding User
+    await User.deleteOne({ _id: student._id });
+    await Student.deleteOne({ _id: student._id });
+
+   
 
     res.status(200).json({ success: true, message: "Student deleted successfully" });
   } catch (err) {
-    console.error("Error deleting student:", err);
+    console.error(err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 
 export const getAllRooms = async (req, res) => {
   try {
@@ -352,14 +354,14 @@ export const getRoomById = async (req, res) => {
     res.status(200).json({
       roomNumber: room.roomNumber,
       capacity: room.capacity,
-      students: room.students.map(student => ({
-        id: student._id,
-        name: `${student.firstName} ${student.lastName}`,
-        email: student.email,
-        phone: student.phone,
-        gender: student.gender,
-        dateOfBirth: student.dateOfBirth,
-        parentDetails: student.parentDetails,
+      students: room.students.map((s) => ({
+        id: s._id,
+        name: `${s.firstName} ${s.lastName}`,
+        email: s.email,
+        phone: s.phone,
+        gender: s.gender,
+        dateOfBirth: s.dateOfBirth,
+        parentDetails: s.parentDetails,
       })),
     });
   } catch (err) {

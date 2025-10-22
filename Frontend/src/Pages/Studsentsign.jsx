@@ -1,28 +1,33 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { AuthContext } from "../Context/Auth";
 
-export const Signin = () => {
+export const StudnetSign = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
-  const { setToken, axiosInstance } = useContext(AuthContext); 
+  const { setToken } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axiosInstance.post("/admin/Login", { email, password });
+      const res = await axios.post(
+        "http://localhost:3000/student/Login",
+        { email, password },
+        { withCredentials: true }
+      );
 
       const { accessToken } = res.data;
       setToken(accessToken);
-      navigate("/admindashboard");
+      navigate("/studentdashboard"); // change route if needed
     } catch (error) {
       console.error("Login error:", error);
       const msg =
-        error.response?.data?.message ||
-        "Invalid credentials or server error.";
+        error.response?.data?.message || "Invalid credentials or server error.";
       alert(msg);
     }
   };
@@ -30,7 +35,7 @@ export const Signin = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
       <div className="bg-gray-800 shadow-2xl rounded-xl flex flex-col md:flex-row overflow-hidden w-full max-w-4xl">
-       
+        {/* Left Section */}
         <div className="flex flex-col justify-center items-center bg-indigo-900 p-10 w-full md:w-1/2">
           <h2 className="text-3xl font-bold text-white mb-4 text-center md:text-left">
             Welcome to Hostel Management
@@ -46,7 +51,7 @@ export const Signin = () => {
           </div>
         </div>
 
- 
+        {/* Right Section */}
         <div className="p-8 md:p-12 w-full md:w-1/2">
           <h2 className="text-2xl font-bold text-white mb-6 text-center md:text-left">
             Sign In
@@ -67,14 +72,23 @@ export const Signin = () => {
 
             <div>
               <label className="text-gray-300 mb-1 block">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="Enter your password"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
             <button
@@ -84,16 +98,6 @@ export const Signin = () => {
               Sign In
             </button>
           </form>
-
-          <div className="mt-6 bg-gray-700/60 border border-indigo-500 rounded-lg p-4 text-gray-200 text-sm shadow-md hover:shadow-indigo-600 transition-all duration-300 hover:scale-[1.02]">
-            <p className="font-semibold text-indigo-400">💡 Demo Admin Login</p>
-            <p>
-              <span className="text-gray-400">Email:</span> admin1@example.com
-            </p>
-            <p>
-              <span className="text-gray-400">Password:</span> Admin@123
-            </p>
-          </div>
         </div>
       </div>
     </div>

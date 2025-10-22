@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
 import { AuthContext } from "../Context/Auth.jsx";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,CartesianGrid,XAxis,YAxis,Bar,PieChart } from "recharts";
 
 export const AnalysisAdmin = () => {
   const { axiosInstance } = useContext(AuthContext);
@@ -135,7 +135,7 @@ export const AnalysisAdmin = () => {
           <p className="text-2xl font-bold">{girlsStudents}</p>
         </div>
       </div>
-      {/* 2-Bed vs 3-Bed Charts */}
+    {/* 2-Bed vs 3-Bed Charts */}
 <div className="flex flex-col md:flex-row gap-6 mb-8">
   {/* Girls Bed Type */}
   <div className="flex-1 bg-gray-800 p-4 md:p-6 rounded-xl shadow-lg min-h-[250px]">
@@ -143,15 +143,18 @@ export const AnalysisAdmin = () => {
       Girls Wing Bed Type
     </h2>
     <ResponsiveContainer width="100%" height={250}>
-      <PieChart>
-        <Pie data={girlsBedChartData} dataKey="value" nameKey="name" outerRadius={80} label>
-          {girlsBedChartData.map((entry, index) => (
-            <Cell key={`cell-g-bed-${index}`} fill={CAPCOLORS[index % CAPCOLORS.length]} />
-          ))}
-        </Pie>
+      <BarChart data={girlsBedChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+        <XAxis dataKey="name" tick={{ fill: "#fff" }} />
+        <YAxis tick={{ fill: "#fff" }} />
         <Tooltip />
-        <Legend verticalAlign="bottom" />
-      </PieChart>
+        <Legend />
+        <Bar dataKey="value" fill="#f472b6" radius={[8, 8, 0, 0]}>
+          {girlsBedChartData.map((entry, index) => (
+            <Cell key={`cell-g-bar-${index}`} fill={CAPCOLORS[index % CAPCOLORS.length]} />
+          ))}
+        </Bar>
+      </BarChart>
     </ResponsiveContainer>
   </div>
 
@@ -161,20 +164,24 @@ export const AnalysisAdmin = () => {
       Boys Wing Bed Type
     </h2>
     <ResponsiveContainer width="100%" height={250}>
-      <PieChart>
-        <Pie data={boysBedChartData} dataKey="value" nameKey="name" outerRadius={80} label>
-          {boysBedChartData.map((entry, index) => (
-            <Cell key={`cell-b-bed-${index}`} fill={CAPCOLORS[index % CAPCOLORS.length]} />
-          ))}
-        </Pie>
+      <BarChart data={boysBedChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+        <XAxis dataKey="name" tick={{ fill: "#fff" }} />
+        <YAxis tick={{ fill: "#fff" }} />
         <Tooltip />
-        <Legend verticalAlign="bottom" />
-      </PieChart>
+        <Legend />
+        <Bar dataKey="value" fill="#facc15" radius={[8, 8, 0, 0]}>
+          {boysBedChartData.map((entry, index) => (
+            <Cell key={`cell-b-bar-${index}`} fill={CAPCOLORS[index % CAPCOLORS.length]} />
+          ))}
+        </Bar>
+      </BarChart>
     </ResponsiveContainer>
   </div>
 </div>
 
-      {/* Occupancy Charts */}
+
+    
       <div className="flex flex-col md:flex-row gap-6 mb-8">
         {/* Girls */}
         <div className="flex-1 bg-gray-800 p-4 md:p-6 rounded-xl shadow-lg min-h-[250px]">
@@ -226,7 +233,7 @@ export const AnalysisAdmin = () => {
         </div>
       </div>
 
-      {/* Room Modal */}
+     
       {selectedRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 p-6 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in relative">
