@@ -4,7 +4,9 @@ import Student from "../Schema/studentschema.js";
 import Room from "../Schema/Roomschema.js";
 import { sendStudentWelcomeEmail } from "./sendmail.js";
 import { v2 as cloudinary } from "cloudinary";
+import User from "../Schema/userschema.js";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken"
 dotenv.config();
 
 
@@ -18,7 +20,6 @@ export const AdminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-  
     if (!email || !password) {
       return res.status(400).json({ message: "Please provide email and password" });
     }
@@ -27,11 +28,10 @@ export const AdminLogin = async (req, res) => {
     const admin = await User.findOne({ email, role: "admin" });
     if (!admin) return res.status(401).json({ message: "Invalid credentials" });
 
-    
+   
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-    // generate tokens
     const accessToken = jwt.sign(
       { id: admin._id, role: admin.role },
       process.env.JWT_ACCESS_SECRET,
@@ -44,22 +44,29 @@ export const AdminLogin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
    
     res.status(200).json({
       message: "Login successful",
       user: { id: admin._id, email: admin.email, role: admin.role },
       accessToken,
-      refreshToken,
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Admin login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
-// Generate random password
+
 const generatePassword = (length = 10) => {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!";
   let password = "";
@@ -69,7 +76,7 @@ const generatePassword = (length = 10) => {
   return password;
 };
 
-// Upload image to Cloudinary
+
 const uploadImage = async (fileBuffer) => {
   if (!fileBuffer) return null;
   return new Promise((resolve, reject) => {
@@ -270,20 +277,26 @@ export const deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
     const student = await Student.findById(id);
-    if (!student) return res.status(404).json({ message: "Student not found" });
-
- 
-    if (student.room) {
-      const room = await Room.findById(student.room);
-      room.students = room.students.filter(s => s.toString() !== student._id.toString());
-      await room.save();
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Student not found" });
     }
 
-    await student.remove();
-    res.status(200).json({ message: "Student deleted successfully" });
+    // Remove student from room if assigned
+    if (student.room) {
+      const room = await Room.findById(student.room);
+      if (room) {
+        room.students = room.students.filter(s => s.toString() !== student._id.toString());
+        await room.save();
+      }
+    }
+
+    // Delete student
+    await student.deleteOne();
+
+    res.status(200).json({ success: true, message: "Student deleted successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error deleting student:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 

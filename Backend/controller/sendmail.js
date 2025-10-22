@@ -52,7 +52,9 @@ Hostel Management Team`,
                 <img src="https://res.cloudinary.com/dtlessn0g/image/upload/v1760998473/hostel_image_l8lacc.png" alt="Hostel Room" style="width: 100%; border-radius: 10px;"/>
               </div>
               <p style="margin-top: 20px;">If you face any issues logging in, contact the hostel admin immediately.</p>
-              <p>Regards,<br/><strong>HostelEase Admin Team</strong></p>
+              <p>Regards,<br/><strong>Shreekant Yadav</strong></p>
+                <a href="https://shreekant-yadav-07.vercel.app/" style="color: #0078d4; text-decoration: none;">Shreekant Portfolio</a>
+              
             </div>
             <div style="background-color: #f4f4f4; text-align: center; padding: 15px; font-size: 13px; color: #666;">
               <p>© 2025 HostelEase. All rights reserved.</p>

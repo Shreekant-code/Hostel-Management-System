@@ -6,10 +6,10 @@ const roomSchema = new mongoose.Schema({
   capacity: { 
     type: Number, 
     required: true,
-    default: () => Math.random() < 0.5 ? 2 : 3 // randomly 2 or 3
+    default: () => Math.random() < 0.5 ? 2 : 3 
   },
   students: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "User" } 
+    { type: mongoose.Schema.Types.ObjectId, ref: "Student" } 
   ]
 }, { timestamps: true });
 

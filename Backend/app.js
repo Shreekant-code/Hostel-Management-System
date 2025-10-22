@@ -1,10 +1,20 @@
 import express from "express"
 import db_connect from "./Database/db_connect.js";
 import Adminroutes from "./routes/adminroutes.js";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-dotenv.config();
-
+import cors from "cors";
 const app=express();
+dotenv.config();
+app.use(
+  cors({
+    origin: true, 
+    credentials: true, 
+  })
+);
+
+
+app.use(cookieParser());
 
 
 
