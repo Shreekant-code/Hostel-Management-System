@@ -5,13 +5,15 @@ import App from "./App.jsx";
 
 import { AuthProvider } from "./Context/Auth.jsx";
 
+import { Toaster } from "sonner";
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
- 
-  <AuthProvider>
-    <App />   
-  </AuthProvider>
-
-
+    <AuthProvider>
+      
+      <Toaster position="top-right" richColors />
+      
+      <App />   
+    </AuthProvider>
   </StrictMode>
 );

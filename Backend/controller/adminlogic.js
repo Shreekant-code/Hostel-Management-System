@@ -175,9 +175,14 @@ export const createStudent = async (req, res) => {
     });
     await user.save();
 
-    sendStudentWelcomeEmail(email, firstName, randomPassword, room.roomNumber)
-      .then(() => console.log("✅ Welcome email sent"))
-      .catch((err) => console.error("❌ Email sending failed:", err));
+try {
+      console.log(`📨 Sending welcome email to: ${email}`);
+      await sendStudentWelcomeEmail(email, firstName, randomPassword, room.roomNumber);
+      console.log(`✅ Welcome email sent to ${email}`);
+    } catch (emailErr) {
+      console.error(`⚠️ Failed to send welcome email to ${email}:`, emailErr.message);
+    }
+
 
     res.status(201).json({
       message: "Student created successfully",

@@ -2,6 +2,9 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../Context/Auth.jsx";
 import { Mail, Phone, Home, User, Calendar, Clock } from "lucide-react";
 
+// ✅ Sonner for creative toasts
+import { toast } from "sonner";
+
 export const StudentData = () => {
   const { axiosInstance } = useContext(AuthContext);
   const [students, setStudents] = useState([]);
@@ -28,14 +31,22 @@ export const StudentData = () => {
   };
   const [formData, setFormData] = useState(initialForm);
 
-  // Fetch all students
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update clock every second
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Fetch students
   const fetchStudents = async () => {
     try {
       const res = await axiosInstance.get("/admin/students");
       setStudents(Array.isArray(res.data.students) ? res.data.students : []);
     } catch (err) {
-      console.error("Failed to fetch students:", err);
-      setStudents([]);
+      console.error(err);
+      toast.error("Failed to fetch students");
     } finally {
       setLoading(false);
     }
@@ -45,21 +56,21 @@ export const StudentData = () => {
     fetchStudents();
   }, []);
 
-  
+  // Delete student
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this student?")) return;
 
     try {
       const res = await axiosInstance.delete(`/admin/students/${id}`);
       if (res.data.success) {
-        setStudents((prev) => prev.filter((s) => s._id !== id)); // remove from UI
-        alert(res.data.message);
+        setStudents((prev) => prev.filter((s) => s._id !== id));
+        toast.success("Student deleted successfully!");
       } else {
-        alert(res.data.message || "Failed to delete student");
+        toast.error(res.data.message || "Failed to delete student");
       }
     } catch (err) {
-      console.error("Failed to delete student:", err.response || err);
-      alert(err.response?.data?.message || "Failed to delete student");
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to delete student");
     }
   };
 
@@ -122,14 +133,16 @@ export const StudentData = () => {
         setStudents((prev) =>
           prev.map((s) => (s._id === editStudent._id ? res.data.student : s))
         );
+        toast.success("Student updated successfully!");
       } else {
         const res = await axiosInstance.post("/admin/students", payload);
         setStudents((prev) => [...prev, res.data.student]);
+        toast.success("Student added successfully!");
       }
       closeModal();
     } catch (err) {
-      console.error("Failed to save student:", err);
-      alert(err.response?.data?.message || "Error saving student");
+      console.error(err);
+      toast.error(err.response?.data?.message || "Error saving student");
     }
   };
 
@@ -272,9 +285,14 @@ export const StudentData = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 p-6 rounded-2xl w-full max-w-3xl text-white overflow-y-auto max-h-[90vh] shadow-2xl border border-gray-700">
-            <h2 className="text-2xl font-bold mb-6 text-center text-green-400">
-              {editStudent ? "Update Student" : "Add Student"}
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-green-400">
+                {editStudent ? "Update Student" : "Add Student"}
+              </h2>
+              <p className="text-gray-300 text-sm flex items-center gap-1">
+                <Clock size={16} /> {currentTime.toLocaleTimeString()}
+              </p>
+            </div>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(formData).map(([key, value]) => {
                 if (key === "gender") {

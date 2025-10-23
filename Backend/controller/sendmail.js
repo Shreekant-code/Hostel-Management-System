@@ -1,13 +1,24 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
-export const sendStudentWelcomeEmail = async (studentEmail, studentName, password, roomNumber) => {
+export const sendStudentWelcomeEmail = async (
+  studentEmail,
+  studentName,
+  password,
+  roomNumber
+) => {
   try {
+    console.log(`📨 Preparing to send welcome email to: ${studentEmail}`);
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD,
       },
+      logger: true, 
+      debug: true, 
     });
 
     const info = await transporter.sendMail({
@@ -48,14 +59,16 @@ Hostel Management Team`,
               </div>
 
               <p>👉 You can now login to your <a href="https://hostelportal.example.com" style="color: #0078d4; text-decoration: none;">Student Dashboard</a> to view your roommates, announcements, and more.</p>
+
               <div style="margin: 30px 0; text-align: center;">
                 <img src="https://res.cloudinary.com/dtlessn0g/image/upload/v1760998473/hostel_image_l8lacc.png" alt="Hostel Room" style="width: 100%; border-radius: 10px;"/>
               </div>
+
               <p style="margin-top: 20px;">If you face any issues logging in, contact the hostel admin immediately.</p>
               <p>Regards,<br/><strong>Shreekant Yadav</strong></p>
-                <a href="https://shreekant-yadav-07.vercel.app/" style="color: #0078d4; text-decoration: none;">Shreekant Portfolio</a>
-              
+              <a href="https://shreekant-yadav-07.vercel.app/" style="color: #0078d4; text-decoration: none;">Shreekant Portfolio</a>
             </div>
+
             <div style="background-color: #f4f4f4; text-align: center; padding: 15px; font-size: 13px; color: #666;">
               <p>© 2025 HostelEase. All rights reserved.</p>
             </div>
@@ -64,8 +77,11 @@ Hostel Management Team`,
       `,
     });
 
-    console.log("✅ Student welcome email sent:", info.messageId);
+    console.log("✅ Student welcome email sent successfully!");
+    console.log("📧 Message ID:", info.messageId);
+    console.log("📨 SMTP Response:", info.response);
+
   } catch (error) {
-    console.error("❌ Error sending student email:", error);
+    console.error("❌ Error sending student email:", error.message);
   }
 };
