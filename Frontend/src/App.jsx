@@ -15,6 +15,7 @@ import { StudnetSign } from "./Pages/Studsentsign";
 import { MyProfile } from "./Pages/Myprofile";
 import { UpcomingStudent } from "./Pages/UpcomingStudent";
 import { Roommates } from "./Pages/Roommates";
+import { Footer } from "./components/Footer";
 
 
 const App = () => {
@@ -22,7 +23,15 @@ const App = () => {
     <Router>
       <Routes>
        
-        <Route path="/" element={<Home />} />
+      <Route
+  path="/"
+  element={
+    <>
+      <Home />
+      <Footer />
+    </>
+  }
+/>
 
        
         <Route path="/adminSignin" element={<Signin />} />

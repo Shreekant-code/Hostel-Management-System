@@ -31,10 +31,10 @@ export const StudentDashboard = () => {
     return (
       <div className="flex items-center justify-center h-screen bg-black">
         <DotLottieReact
-          src="https://lottie.host/24974383-c52e-4460-957f-0b88e2980ff1/R9E2PMqnsM.lottie"
+           src="https://lottie.host/8d1e9224-bd04-4885-8abd-ea8bafb2662c/JqmVKjsrY9.lottie"
           autoplay
           loop
-          style={{ width: 300, height: 300 }}
+          style={{ width: 600, height: 600 }}
         />
       </div>
     );

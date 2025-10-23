@@ -120,14 +120,7 @@ export const Admindashboard = () => {
     </ul>
 
   
-    <div className="mt-auto flex justify-center pb-4">
-      <DotLottieReact
-        src="https://lottie.host/be6b7a2a-3884-460e-979a-e1afc5ffeaa7/sgPIXr9nhO.lottie"
-        loop
-        autoplay
-        className="w-50 h-130"
-      />
-    </div>
+    
   </div>
 </aside>
 

@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../Context/Auth";
-import { FaEnvelope, FaPhone, FaUser, FaCalendarAlt, FaUserTie } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaPhone,
+  FaUser,
+  FaCalendarAlt,
+  FaUserTie,
+} from "react-icons/fa";
 
 export const Roommates = () => {
   const { axiosInstance } = useContext(AuthContext);
@@ -23,8 +29,10 @@ export const Roommates = () => {
     fetchRoommates();
   }, [axiosInstance]);
 
-  if (loading) return <p className="text-white text-center mt-20">Loading roommates...</p>;
-  if (!roommates.length) return <p className="text-white text-center mt-20">No roommates found.</p>;
+  if (loading)
+    return <p className="text-white text-center mt-20">Loading roommates...</p>;
+  if (!roommates.length)
+    return <p className="text-white text-center mt-20">No roommates found.</p>;
 
   return (
     <section className="p-6 max-w-6xl mx-auto space-y-8">
@@ -68,16 +76,24 @@ export const Roommates = () => {
                   <FaCalendarAlt className="text-indigo-400" /> Year: {mate.year}
                 </p>
               )}
+              {mate.admissionYear && (
+                <p className="flex items-center gap-2">
+                  <FaCalendarAlt className="text-green-400" /> Admission Year:{" "}
+                  {mate.admissionYear}
+                </p>
+              )}
               {(mate.fatherName || mate.motherName) && (
                 <div className="space-y-1">
                   {mate.fatherName && (
                     <p className="flex items-center gap-2">
-                      <FaUserTie className="text-indigo-400" /> Father: {mate.fatherName} ({mate.fatherPhone || "-"})
+                      <FaUserTie className="text-indigo-400" /> Father:{" "}
+                      {mate.fatherName} ({mate.fatherPhone || "-"})
                     </p>
                   )}
                   {mate.motherName && (
                     <p className="flex items-center gap-2">
-                      <FaUserTie className="text-pink-400" /> Mother: {mate.motherName} ({mate.motherPhone || "-"})
+                      <FaUserTie className="text-pink-400" /> Mother:{" "}
+                      {mate.motherName} ({mate.motherPhone || "-"})
                     </p>
                   )}
                 </div>
