@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000",
+    baseURL: "https://hostel-management-system-wqq5.onrender.com",
     withCredentials: true, 
   });
 

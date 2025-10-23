@@ -16,7 +16,7 @@ export const StudnetSign = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/student/Login",
+        "https://hostel-management-system-wqq5.onrender.com/student/Login",
         { email, password },
         { withCredentials: true }
       );
