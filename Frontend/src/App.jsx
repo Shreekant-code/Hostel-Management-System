@@ -10,7 +10,7 @@ import { StudentData } from "./Pages/Studnetdata";
 import { UpcomingAdmin } from "./Pages/Upcomingfeature";
 
 
-import { StudentDashboard } from "./Pages/StudentDashboard";
+import { StudentDashboard } from "./Pages/Studentdashboard";
 import { StudnetSign } from "./Pages/Studsentsign";
 import { MyProfile } from "./Pages/Myprofile";
 import { UpcomingStudent } from "./Pages/UpcomingStudent";
