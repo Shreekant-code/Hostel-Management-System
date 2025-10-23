@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import { Menu, Bell, User, Users, Book, Star } from "lucide-react"; // added icons
+import { Menu, Bell, User, Users, Book, Star } from "lucide-react"; 
 import { AuthContext } from "../Context/Auth";
 
 export const StudentDashboard = () => {
