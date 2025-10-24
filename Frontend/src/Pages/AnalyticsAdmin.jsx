@@ -1,6 +1,19 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
 import { AuthContext } from "../Context/Auth.jsx";
-import { BarChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,CartesianGrid,XAxis,YAxis,Bar,PieChart } from "recharts";
+import {
+  BarChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Bar,
+  PieChart,
+} from "recharts";
+import CountUp from "react-countup";
 
 export const AnalysisAdmin = () => {
   const { axiosInstance } = useContext(AuthContext);
@@ -9,7 +22,6 @@ export const AnalysisAdmin = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [modalData, setModalData] = useState(null);
 
-  // Fetch rooms function
   const fetchRooms = useCallback(async () => {
     try {
       setLoading(true);
@@ -50,20 +62,25 @@ export const AnalysisAdmin = () => {
     setModalData(null);
   };
 
-  if (loading) return <div className="text-white text-center mt-10 text-xl">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-white text-center mt-10 text-xl">Loading...</div>
+    );
 
   const allRooms = [...roomsData.boysWing, ...roomsData.girlsWing];
   const totalRooms = allRooms.length;
   const totalStudents = allRooms.reduce((acc, r) => acc + r.students.length, 0);
   const boysStudents = roomsData.boysWing.reduce((acc, r) => acc + r.students.length, 0);
   const girlsStudents = roomsData.girlsWing.reduce((acc, r) => acc + r.students.length, 0);
+  const boysSeats = roomsData.boysWing.reduce((acc, r) => acc + r.capacity, 0);
+  const girlsSeats = roomsData.girlsWing.reduce((acc, r) => acc + r.capacity, 0);
 
   const COLORS = ["#FF4D4F", "#FAAD14", "#52C41A"];
   const CAPCOLORS = ["#1890FF", "#13C2C2"];
 
   const computeChartData = (rooms) => {
     let filled = 0, partial = 0, empty = 0;
-    rooms.forEach(r => {
+    rooms.forEach((r) => {
       const s = r.students.length;
       if (s >= r.capacity) filled++;
       else if (s > 0) partial++;
@@ -72,7 +89,7 @@ export const AnalysisAdmin = () => {
     return [
       { name: "Filled", value: filled },
       { name: "Partial", value: partial },
-      { name: "Empty", value: empty }
+      { name: "Empty", value: empty },
     ];
   };
 
@@ -80,8 +97,8 @@ export const AnalysisAdmin = () => {
   const girlsChartData = computeChartData(roomsData.girlsWing);
 
   const getCapacityStats = (rooms) => {
-    const cap2 = rooms.filter(r => r.capacity === 2).map(r => r.roomNumber);
-    const cap3 = rooms.filter(r => r.capacity === 3).map(r => r.roomNumber);
+    const cap2 = rooms.filter((r) => r.capacity === 2).map((r) => r.roomNumber);
+    const cap3 = rooms.filter((r) => r.capacity === 3).map((r) => r.roomNumber);
     return { cap2, cap3 };
   };
 
@@ -115,79 +132,83 @@ export const AnalysisAdmin = () => {
   );
 
   return (
-    <div className="w-full bg-gray-900 text-white p-4">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div className="w-full bg-gray-900 text-white p-4 md:p-6 lg:p-10">
+     
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 p-6 rounded-xl shadow-lg text-center">
           <p className="text-gray-900 font-semibold">Total Rooms</p>
-          <p className="text-2xl font-bold">{totalRooms}</p>
+          <p className="text-3xl font-bold"><CountUp end={totalRooms} duration={1.5} /></p>
         </div>
         <div className="bg-gradient-to-r from-indigo-500 to-indigo-400 p-6 rounded-xl shadow-lg text-center">
           <p className="text-gray-900 font-semibold">Total Students</p>
-          <p className="text-2xl font-bold">{totalStudents}</p>
+          <p className="text-3xl font-bold"><CountUp end={totalStudents} duration={1.5} /></p>
+        </div>
+        <div className="bg-gradient-to-r from-blue-500 to-blue-400 p-6 rounded-xl shadow-lg text-center">
+          <p className="text-gray-900 font-semibold">Total Boys Beds</p>
+          <p className="text-3xl font-bold"><CountUp end={boysSeats} duration={1.5} /></p>
         </div>
         <div className="bg-gradient-to-r from-pink-500 to-pink-400 p-6 rounded-xl shadow-lg text-center">
-          <p className="text-gray-900 font-semibold">Boys Students</p>
-          <p className="text-2xl font-bold">{boysStudents}</p>
-        </div>
-        <div className="bg-gradient-to-r from-green-500 to-green-400 p-6 rounded-xl shadow-lg text-center">
-          <p className="text-gray-900 font-semibold">Girls Students</p>
-          <p className="text-2xl font-bold">{girlsStudents}</p>
+          <p className="text-gray-900 font-semibold">Total Girls Beds</p>
+          <p className="text-3xl font-bold"><CountUp end={girlsSeats} duration={1.5} /></p>
         </div>
       </div>
-    {/* 2-Bed vs 3-Bed Charts */}
-<div className="flex flex-col md:flex-row gap-6 mb-8">
-  {/* Girls Bed Type */}
-  <div className="flex-1 bg-gray-800 p-4 md:p-6 rounded-xl shadow-lg min-h-[250px]">
-    <h2 className="text-xl font-bold mb-4 text-center md:text-left text-pink-400">
-      Girls Wing Bed Type
-    </h2>
-    <ResponsiveContainer width="100%" height={250}>
-      <BarChart data={girlsBedChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-        <XAxis dataKey="name" tick={{ fill: "#fff" }} />
-        <YAxis tick={{ fill: "#fff" }} />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="value" fill="#f472b6" radius={[8, 8, 0, 0]}>
-          {girlsBedChartData.map((entry, index) => (
-            <Cell key={`cell-g-bar-${index}`} fill={CAPCOLORS[index % CAPCOLORS.length]} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
-
-  {/* Boys Bed Type */}
-  <div className="flex-1 bg-gray-800 p-4 md:p-6 rounded-xl shadow-lg min-h-[250px]">
-    <h2 className="text-xl font-bold mb-4 text-center md:text-left text-yellow-400">
-      Boys Wing Bed Type
-    </h2>
-    <ResponsiveContainer width="100%" height={250}>
-      <BarChart data={boysBedChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-        <XAxis dataKey="name" tick={{ fill: "#fff" }} />
-        <YAxis tick={{ fill: "#fff" }} />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="value" fill="#facc15" radius={[8, 8, 0, 0]}>
-          {boysBedChartData.map((entry, index) => (
-            <Cell key={`cell-b-bar-${index}`} fill={CAPCOLORS[index % CAPCOLORS.length]} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
-</div>
-
 
     
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-gray-800 rounded-xl p-6 text-center shadow-lg">
+          <h3 className="text-2xl font-bold text-yellow-400 mb-3">Boys Added</h3>
+          <p className="text-4xl font-extrabold text-white"><CountUp end={boysStudents} duration={1.5} /></p>
+          <p className="text-gray-400 mt-2">students currently in hostel</p>
+        </div>
+        <div className="bg-gray-800 rounded-xl p-6 text-center shadow-lg">
+          <h3 className="text-2xl font-bold text-pink-400 mb-3">Girls Added</h3>
+          <p className="text-4xl font-extrabold text-white"><CountUp end={girlsStudents} duration={1.5} /></p>
+          <p className="text-gray-400 mt-2">students currently in hostel</p>
+        </div>
+      </div>
+
+      
       <div className="flex flex-col md:flex-row gap-6 mb-8">
-        {/* Girls */}
-        <div className="flex-1 bg-gray-800 p-4 md:p-6 rounded-xl shadow-lg min-h-[250px]">
-          <h2 className="text-xl font-bold mb-4 text-center md:text-left text-pink-400">
-            Girls Wing Occupancy
-          </h2>
+        <div className="flex-1 bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-bold mb-4 text-pink-400 text-center">Girls Wing Bed Type</h2>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={girlsBedChartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <XAxis dataKey="name" tick={{ fill: "#fff" }} />
+              <YAxis tick={{ fill: "#fff" }} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                {girlsBedChartData.map((entry, index) => (
+                  <Cell key={`cell-g-bar-${index}`} fill={CAPCOLORS[index % CAPCOLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="flex-1 bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-bold mb-4 text-yellow-400 text-center">Boys Wing Bed Type</h2>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={boysBedChartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <XAxis dataKey="name" tick={{ fill: "#fff" }} />
+              <YAxis tick={{ fill: "#fff" }} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                {boysBedChartData.map((entry, index) => (
+                  <Cell key={`cell-b-bar-${index}`} fill={CAPCOLORS[index % CAPCOLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Occupancy Pie Charts */}
+      <div className="flex flex-col md:flex-row gap-6 mb-8">
+        <div className="flex-1 bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-bold mb-4 text-pink-400 text-center">Girls Wing Occupancy</h2>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie data={girlsChartData} dataKey="value" nameKey="name" outerRadius={80} label>
@@ -196,16 +217,12 @@ export const AnalysisAdmin = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend verticalAlign="bottom" />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
-
-        {/* Boys */}
-        <div className="flex-1 bg-gray-800 p-4 md:p-6 rounded-xl shadow-lg min-h-[250px]">
-          <h2 className="text-xl font-bold mb-4 text-center md:text-left text-yellow-400">
-            Boys Wing Occupancy
-          </h2>
+        <div className="flex-1 bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-bold mb-4 text-yellow-400 text-center">Boys Wing Occupancy</h2>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie data={boysChartData} dataKey="value" nameKey="name" outerRadius={80} label>
@@ -214,40 +231,36 @@ export const AnalysisAdmin = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend verticalAlign="bottom" />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Rooms */}
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1">
           <h2 className="text-2xl font-semibold mb-4 text-center md:text-left">Girls Wing</h2>
           <div className="flex flex-wrap gap-2 justify-center md:justify-start">{roomsData.girlsWing.map(renderRoom)}</div>
         </div>
-
         <div className="flex-1">
           <h2 className="text-2xl font-semibold mb-4 text-center md:text-left">Boys Wing</h2>
           <div className="flex flex-wrap gap-2 justify-center md:justify-start">{roomsData.boysWing.map(renderRoom)}</div>
         </div>
       </div>
 
-     
       {selectedRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 p-6 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in relative">
+          <div className="bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 p-6 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl relative">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-yellow-400">
                 Room {modalData?.roomNumber || selectedRoom} Students
               </h3>
               <button onClick={closeModal} className="text-white text-xl font-bold hover:text-red-500 transition">&times;</button>
             </div>
-
             {modalData?.students && modalData.students.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {modalData.students.map((student) => (
-                  <div key={student.id} className="p-4 bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
+                  <div key={student.id} className="p-4 bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition">
                     <p className="text-lg font-semibold text-white">{student.name}</p>
                     <p className="text-sm text-gray-300"><span className="font-semibold">Email:</span> {student.email}</p>
                     <p className="text-sm text-gray-300"><span className="font-semibold">Phone:</span> {student.phone}</p>

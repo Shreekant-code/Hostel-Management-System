@@ -19,7 +19,7 @@ export const StudentSign = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://hostel-management-system-wqq5.onrender.com/student/Login",
+        "http://localhost:3000/student/Login",
         { email, password },
         { withCredentials: true }
       );

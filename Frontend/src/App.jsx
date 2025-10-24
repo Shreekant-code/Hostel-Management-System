@@ -11,7 +11,7 @@ import { UpcomingAdmin } from "./Pages/Upcomingfeature";
 
 
 import { StudentDashboard } from "./Pages/Studentdashboard";
-import { StudnetSign } from "./Pages/Studsentsign";
+import { StudentSign } from "./Pages/Studsentsign";
 import { MyProfile } from "./Pages/Myprofile";
 import { UpcomingStudent } from "./Pages/UpcomingStudent";
 import { Roommates } from "./Pages/Roommates";
@@ -35,7 +35,7 @@ const App = () => {
 
        
         <Route path="/adminSignin" element={<Signin />} />
-        <Route path="/studentSignin" element={<StudnetSign />} />
+        <Route path="/studentSignin" element={<StudentSign />} />
 
       
         <Route path="/admindashboard" element={<Admindashboard />}>
