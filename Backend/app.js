@@ -14,6 +14,8 @@ app.use(
   })
 );
 
+const PORT=process.env.PORT || 5000;
+
 
 app.use(cookieParser());
 
@@ -27,6 +29,6 @@ app.use("/student",Studentrouter);
 
 
 
-app.listen(3000,()=>{
+app.listen(PORT,()=>{
     console.log(`Server is running on Port 3000`);
 })
